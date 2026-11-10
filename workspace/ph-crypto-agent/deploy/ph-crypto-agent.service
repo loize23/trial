@@ -1,0 +1,65 @@
+# deploy/ph-crypto-agent.service
+#
+# Run the agent as a supervised service on a small VPS (Ubuntu/Debian).
+# systemd restarts it if it crashes and after reboots -- a bot that silently dies
+# while holding a position is how you discover you had no stop loss.
+#
+# Install:
+#   sudo mkdir -p /opt/ph-crypto-agent
+#   sudo cp -r ./* /opt/ph-crypto-agent/
+#   sudo cp deploy/ph-crypto-agent.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now ph-crypto-agent
+#   journalctl -u ph-crypto-agent -f          # watch the log
+#
+# Emergency stop (works even if systemd is confused):
+#   sudo touch /opt/ph-crypto-agent/KILL      # agent refuses to trade
+#   sudo systemctl stop ph-crypto-agent       # or kill it outright
+
+[Unit]
+Description=ph-crypto-agent (paper trading by default)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Never run as root. Create a dedicated user:  sudo useradd -r -s /usr/sbin/nologin trader
+User=trader
+Group=trader
+WorkingDirectory=/opt/ph-crypto-agent
+ExecStart=/usr/bin/python3 /opt/ph-crypto-agent/run.py loop
+Restart=always
+RestartSec=30
+
+# Secrets go in an EnvironmentFile that is chmod 600 and owned by trader, NOT in this unit.
+#   sudo nano /etc/ph-crypto-agent.env
+#     EXCHANGE_API_KEY=...
+#     EXCHANGE_API_SECRET=...
+#     TG_BOT_TOKEN=...
+#     TG_CHAT_ID=...
+#     LLM_API_KEY=...
+#     I_UNDERSTAND_I_CAN_LOSE_MONEY=yes     # only if you truly mean mode=live
+#   sudo chmod 600 /etc/ph-crypto-agent.env && sudo chown trader: /etc/ph-crypto-agent.env
+EnvironmentFile=-/etc/ph-crypto-agent.env
+
+# --- hardening: the bot should not be able to do anything except run ---
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/ph-crypto-agent/data
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+# --- resource caps so a runaway loop cannot bankrupt the VPS bill ---
+MemoryMax=400M
+CPUQuota=50%
+
+# --- log to journald, capped ---
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ph-crypto-agent
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,78 @@
+{
+  "mode": "paper",
+  "comment": "mode = 'paper' (default, fake money) or 'live' (real money, requires keys + explicit opt-in)",
+
+  "base_currency": "USDT",
+  "starting_balance": 1000.0,
+
+  "symbols": ["BTC/USDT", "ETH/USDT", "SOL/USDT"],
+
+  "symbol_config_comment": "Per-symbol instrument overrides. Each entry can be a plain string (spot, leverage 1) or an object with type/leverage/etc. Types: 'spot' | 'futures' | 'forex'. Futures = USDT-margined perpetuals (Binance/Bybit). Forex = spot FX pairs.",
+  "symbol_config": {
+    "BTC/USDT": {"type": "spot", "leverage": 1},
+    "ETH/USDT": {"type": "spot", "leverage": 1},
+    "SOL/USDT": {"type": "spot", "leverage": 1}
+  },
+
+  "default_instrument_comment": "Default instrument applied when a symbol is not in symbol_config.",
+  "default_instrument": {"type": "spot", "leverage": 1, "contract_multiplier": 1, "tick_size": 0.01, "min_qty": 0.001, "funding_rate_pct": 0.0},
+
+  "timeframe": "1h",
+  "candles": 300,
+
+  "strategy_name_comment": "Select a strategy: trend_pullback | rsi_mean_reversion | bollinger_bands | macd_crossover",
+  "strategy_name": "trend_pullback",
+
+  "strategy": {
+    "fast_ema": 12,
+    "slow_ema": 26,
+    "rsi_period": 14,
+    "rsi_max_entry": 70,
+    "rsi_min_entry": 30,
+    "atr_period": 14,
+    "atr_stop_mult": 2.0,
+    "atr_target_mult": 3.0
+  },
+
+  "risk": {
+    "max_position_pct_of_equity": 0.10,
+    "risk_per_trade_pct": 1.0,
+    "max_open_positions": 3,
+    "daily_loss_limit_pct": 4.0,
+    "total_drawdown_halt_pct": 15.0,
+    "max_consecutive_losses": 4,
+    "min_order_quote": 10.0,
+    "require_stop_loss": true,
+    "max_leverage": 5.0,
+    "liquidation_buffer_pct": 2.0
+  },
+
+  "fees": { "taker_pct": 0.1, "slippage_pct": 0.05 },
+
+  "exchange": {
+    "id": "binance",
+    "api_key": "",
+    "api_secret": "",
+    "note": "Only needed for mode=live. NEVER enable withdrawals on this key. Add an IP allowlist. Note PH SEC access restrictions - read GUIDE.md section 2."
+  },
+
+  "llm": {
+    "enabled": false,
+    "role": "research_only",
+    "provider": "openai",
+    "base_url": "https://api.openai.com/v1",
+    "model": "gpt-4o-mini",
+    "api_key_env": "LLM_API_KEY",
+    "note": "The LLM writes a market briefing and critiques trades. It CANNOT place orders - see GUIDE.md section 4."
+  },
+
+  "notify": {
+    "telegram_bot_token": "",
+    "telegram_chat_id": "",
+    "note": "Optional. Sends trade + alert messages to Telegram."
+  },
+
+  "loop_seconds": 300,
+  "state_file": "data/state.json",
+  "trades_csv": "data/trades.csv"
+}

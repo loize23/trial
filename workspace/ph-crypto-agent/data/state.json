@@ -1,0 +1,14 @@
+{
+  "cash": 30.0,
+  "starting_balance": 30.0,
+  "positions": {},
+  "risk": {
+    "equity_peak": 30.0,
+    "day": "2026-11-10",
+    "day_start_equity": 30.0,
+    "consecutive_losses": 0,
+    "halted_reason": "",
+    "rejected": []
+  },
+  "created": "2026-11-10T22:55:20+00:00"
+}

@@ -1,0 +1,17 @@
+# Nothing here is required for paper trading or backtesting -- the kit is pure stdlib.
+# Install only what you need.
+
+# --- LIVE trading only ---
+ccxt>=4.0            # unified API for 100+ exchanges; required for mode="live"
+
+# --- Optional: better technical analysis when you outgrow agent/indicators.py ---
+# pandas>=2.0
+# numpy>=1.24
+# TA-Lib>=0.4.28     # needs the C library first: apt install build-essential && pip install ta-lib
+
+# --- Optional: the serious open-source alternative (Route 2 in GUIDE.md) ---
+# freqtrade        # install via its own ./setup.sh -i, not pip, to get TA-Lib built correctly
+
+# --- Optional: nicer LLM client than the stdlib urllib call in agent/llm.py ---
+# openai>=1.0
+# anthropic>=0.30

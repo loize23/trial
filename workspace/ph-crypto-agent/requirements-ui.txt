@@ -1,0 +1,4 @@
+# UI dependencies for streamlit_app.py
+streamlit>=1.30
+pandas>=2.0
+plotly>=5.0
